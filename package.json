@@ -1,0 +1,27 @@
+{
+  "name": "megameetup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "devStart": "nodemon app.js",
+    "start": "node app.js"
+  },
+  "author": "Bhuvi100",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.4",
+    "cookie-parser": "^1.4.5",
+    "dotenv": "^10.0.0",
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "express-session": "^1.17.2",
+    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.33",
+    "prettier": "^2.4.1",
+    "querystring": "^0.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  }
+}

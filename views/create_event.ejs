@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home Page</title>
+</head>
+<body>
+    <center>
+      Hello <%= name %>,
+      Here are the groups you are member of,
+
+      <% groups.forEach(function (group) { %>
+      
+      <%= group.node.name %>
+
+      <% }) %> <br> <br>
+
+      <ul>
+      Events:
+      <% events.forEach((event) => { %>
+        <li> <a href="/dashboard/events/<%= event.title %>"><%= event.title %> </a> </li>
+        Groups: 
+        <ol> <% event.groups.forEach((group) => { %>
+        <li> Name: <%= group.name %> ID: <%= group.id %> <%= group.event_id %>  </li>
+        <% }) %>
+        </ol>
+         <% }) %>
+      </ul>
+
+      <form action="/events/store" method="post">
+
+      <input type="hidden" name="old_title" value="">
+
+      Title: <input type="text" name="title" value="">
+<br><br>
+
+    Description: <textarea name="description"> </textarea>
+<br><br>
+      At: <input type="datetime-local" name="dateTime" value="">
+
+<br><br>
+
+      Duration: <input type="text" name="duration" value="">
+<br><br>
+
+Select groups: 
+      <% groups.forEach(function (group) { %>
+      
+     <input type="checkbox" name="groups[]" value="<%= group.node.urlname %>" 
+     ><%= group.node.name %>
+
+      <% }) %> <br> <br>
+
+<input type="submit" value="Update">
+      </form>
+    </center>
+</body>
+</html>        

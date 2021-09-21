@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home Page</title>
+</head>
+<body>
+    <center>
+      Hello <%= name %>,
+      Here are the groups you are member of,
+
+      <% groups.forEach(function (group) { %>
+      
+      <%= group.node.name %>
+
+      <% }) %> <br> <br>
+
+      <ul>
+      Events:
+      <% if (events.length) { %>
+      <% events.forEach((event) => { %>
+        <li> <a href="/dashboard/events/<%= event.title %>"><%= event.title %> </a> </li>
+        Groups: 
+        <ol> <% event.groups.forEach((group) => { %>
+        <li> Name: <%= group.name %> ID: <%= group.id %> <%= group.event_id %>  </li>
+        <% }) %>
+        </ol>
+         <% }) %>
+      </ul>
+
+      <form action="/events/update" method="post">
+
+      <input type="hidden" name="old_title" value="<%= current_event.title %>">
+
+      Title: <input type="text" name="title" value="<%= current_event.title %>">
+<br><br>
+
+    Description: <textarea name="description"> <%= current_event.description %> </textarea>
+<br><br>
+      At: <input type="datetime-local" name="dateTime" value="<%= current_event.dateTime %>">
+
+<br><br>
+
+      Duration: <input type="text" name="duration" value="<%= current_event.duration %>">
+<br><br>
+
+Select groups: 
+      <% groups.forEach(function (group) { %>
+      
+     <input type="checkbox" name="groups[]" value="<%= group.node.urlname %>" 
+     <% if (current_event_groups.indexOf(group.node.urlname) !== -1) { %> checked <% } %>
+     ><%= group.node.name %>
+
+      <% }) %> <br> <br>
+
+<input type="submit" value="Update">
+      </form>
+
+<br>
+      <form method="post" action="/events/delete">
+      <input type="hidden" name="title" value="<%= current_event.title %>">
+
+      <input type="submit" value="Delete event">
+      </form>
+
+      <% } %>
+
+      <br>
+
+      <a href="/events/create">Create event</a>
+    </center>
+</body>
+</html>        
