@@ -8,7 +8,7 @@ exports.dashboard = async (req, res) => {
       query: queries.get_groups_events,
       variables: `{
                 "urlname": "${req.session.network_url}" 
-            }`,
+              }`,
     });
 
     let data = response.data.data;
@@ -35,7 +35,7 @@ exports.dashboard = async (req, res) => {
       query: queries.get_event,
       variables: `{
                 "eventId": "${current_event.groups[0].event_id}" 
-            }`,
+              }`,
     });
 
     let event_data = response.data.data.event;
@@ -86,7 +86,7 @@ exports.show = async (req, res) => {
       query: queries.get_event,
       variables: `{
                 "eventId": "${current_event[0].event_id}" 
-            }`,
+               }`,
     });
 
     let event_data = response.data.data.event;
@@ -132,9 +132,23 @@ exports.update = async (req, res) => {
     let events_needed_to_deleted = [];
     let groups_input = req.body.groups;
 
-    if (groups_input == undefined) {
+    if (groups_input === undefined) {
       return res.send(400, "Please select atleast one group");
     }
+
+    let variables = ``;
+    let query = ``;
+    let inputs = ``;
+    let input_count = 1;
+    let get_inputs = (count, event) => {
+      return `"input${count}": {
+		                    "eventId": "${event.event_id}",
+                            "title": "${title}",
+                            "description": "${description}",
+                            "startDateTime": "${dateTime}",
+                            "duration": "${duration}"
+	                    }`;
+    };
 
     for (const event of current_event) {
       if (groups_input.indexOf(event.urlname) === -1) {
@@ -144,57 +158,122 @@ exports.update = async (req, res) => {
           return group !== event.urlname;
         });
 
-        response = await utils.axios.post("https://api.meetup.com/gql", {
-          query: queries.edit_event,
-          variables: `{
-                        "input": {
-		                    "eventId": "${event.event_id}",
-                            "title": "${title}",
-                            "description": "${description}",
-                            "startDateTime": "${dateTime}",
-                            "duration": "${duration}"
-	                    }
-                    }`,
-        });
+        let { current_variable, current_query } =
+          queries.edit_event(input_count);
+
+        if (input_count === 1) {
+          variables += `${current_variable}`;
+          query += `${current_query}`;
+          inputs += `${get_inputs(input_count, event)}`;
+        } else {
+          variables += `, ${current_variable}`;
+          query += `, ${current_query}`;
+          inputs += `, ${get_inputs(input_count, event)}`;
+        }
+
+        input_count += 1;
       }
     }
 
-    for (const group of groups_input) {
-      response = await utils.axios.post("https://api.meetup.com/gql", {
-        query: queries.create_event_draft,
-        variables: `{
-                    "input": {
+    let events_need_to_be_published = [];
+    get_inputs = (count, group) => {
+      return `"input${count}": {
                         "groupUrlname": "${group}",
                         "title": "${title}",
                         "description": "${description}",
                         "startDateTime": "${dateTime}",
                         "venueId": "online",
                         "duration": "${duration}"
-                    }
-                }`,
-      });
-      let event_id = response.data.data.createEventDraft.event.id;
+                    }`;
+    };
 
-      await utils.axios.post("https://api.meetup.com/gql", {
-        query: queries.publish_event,
-        variables: `{
-                        "input": {
-                            "eventId": "${event_id}"
-                        }
-                    }`,
-      });
+    for (const group of groups_input) {
+      let { current_variable, current_query } =
+        queries.create_event_draft(input_count);
+
+      if (input_count === 1) {
+        variables += `${current_variable}`;
+        query += `${current_query}`;
+        inputs += `${get_inputs(input_count, group)}`;
+      } else {
+        variables += `, ${current_variable}`;
+        query += `, ${current_query}`;
+        inputs += `, ${get_inputs(input_count, group)}`;
+      }
+
+      events_need_to_be_published.push(input_count);
+      input_count += 1;
     }
+
+    get_inputs = (count, event) => {
+      return `"input${count}": {
+		                    "eventId": "${event}"
+	                      }`;
+    };
 
     for (const event of events_needed_to_deleted) {
-      await utils.axios.post("https://api.meetup.com/gql", {
-        query: queries.delete_event,
-        variables: `{
-                    "input": {
-                        "eventId": "${event}"
-                    }
-                }`,
-      });
+      let { current_variable, current_query } =
+        queries.delete_event(input_count);
+
+      if (input_count === 1) {
+        variables += `${current_variable}`;
+        query += `${current_query}`;
+        inputs += `${get_inputs(input_count, event)}`;
+      } else {
+        variables += `, ${current_variable}`;
+        query += `, ${current_query}`;
+        inputs += `, ${get_inputs(input_count, event)}`;
+      }
+
+      input_count += 1;
     }
+
+    response = await utils.axios.post("https://api.meetup.com/gql", {
+      query: `mutation(${variables}) {
+                  ${query}
+              }`,
+      variables: `{
+                    ${inputs}
+                  }`,
+    });
+
+    let events_ids_published = [];
+
+    for (const event of events_need_to_be_published) {
+      events_ids_published.push(
+        response.data.data[`query${event}`].event.id.replace(/\D/g, "")
+      );
+    }
+
+    variables = ``;
+    query = ``;
+    inputs = ``;
+    input_count = 1;
+
+    for (const event of events_ids_published) {
+      let { current_variable, current_query } =
+        queries.publish_event(input_count);
+
+      if (input_count === 1) {
+        variables += `${current_variable}`;
+        query += `${current_query}`;
+        inputs += `${get_inputs(input_count, event)}`;
+      } else {
+        variables += `, ${current_variable}`;
+        query += `, ${current_query}`;
+        inputs += `, ${get_inputs(input_count, event)}`;
+      }
+      input_count += 1;
+    }
+
+    response = await utils.axios.post("https://api.meetup.com/gql", {
+      query: `  mutation(${variables}) {
+            ${query}
+          }`,
+      variables: `{
+                   ${inputs}
+                  }`,
+    });
 
     return res.redirect("/dashboard");
   } catch (error) {
@@ -233,34 +312,93 @@ exports.store = async (req, res) => {
     let duration = req.body.duration;
     let response = "";
 
-    for (const group of groups_input) {
-      response = await utils.axios.post("https://api.meetup.com/gql", {
-        query: queries.create_event_draft,
-        variables: `{
-                    "input": {
+    let variables = ``;
+    let query = ``;
+    let inputs = ``;
+    let input_count = 1;
+    let events_need_to_be_published = [];
+    let get_inputs = (count, group) => {
+      return `"input${count}": {
                         "groupUrlname": "${group}",
                         "title": "${title}",
                         "description": "${description}",
                         "startDateTime": "${dateTime}",
                         "venueId": "online",
                         "duration": "${duration}"
-                    }
-                }`,
-      });
+                    }`;
+    };
 
-      let event_id = response.data.data.createEventDraft.event.id;
+    for (const group of groups_input) {
+      let { current_variable, current_query } =
+        queries.create_event_draft(input_count);
 
-      await utils.axios.post("https://api.meetup.com/gql", {
-        query: queries.publish_event,
-        variables: `{
-                    "input": {
-                        "eventId": "${event_id}"
-                    }
-                }`,
-      });
+      if (input_count === 1) {
+        variables += `${current_variable}`;
+        query += `${current_query}`;
+        inputs += `${get_inputs(input_count, group)}`;
+      } else {
+        variables += `, ${current_variable}`;
+        query += `, ${current_query}`;
+        inputs += `, ${get_inputs(input_count, group)}`;
+      }
+
+      events_need_to_be_published.push(input_count);
+      input_count += 1;
     }
 
-     return res.redirect('/dashboard');
+    response = await utils.axios.post("https://api.meetup.com/gql", {
+      query: `  mutation(${variables}) {
+            ${query}
+          }`,
+      variables: `{
+                        ${inputs}
+                    }`,
+    });
+
+    let events_ids_published = [];
+
+    for (const event of events_need_to_be_published) {
+      events_ids_published.push(
+        response.data.data[`query${event}`].event.id.replace(/\D/g, "")
+      );
+    }
+
+    variables = ``;
+    query = ``;
+    inputs = ``;
+    input_count = 1;
+    get_inputs = (count, event) => {
+      return `"input${count}": {
+		                    "eventId": "${event}"
+	                    }`;
+    };
+
+    for (const event of events_ids_published) {
+      let { current_variable, current_query } =
+        queries.publish_event(input_count);
+
+      if (input_count === 1) {
+        variables += `${current_variable}`;
+        query += `${current_query}`;
+        inputs += `${get_inputs(input_count, event)}`;
+      } else {
+        variables += `, ${current_variable}`;
+        query += `, ${current_query}`;
+        inputs += `, ${get_inputs(input_count, event)}`;
+      }
+      input_count += 1;
+    }
+
+    response = await utils.axios.post("https://api.meetup.com/gql", {
+      query: `  mutation(${variables}) {
+            ${query}
+          }`,
+      variables: `{
+                        ${inputs}
+                    }`,
+    });
+
+    return res.redirect("/dashboard");
   } catch (error) {
     console.log(error);
     return res.json(error);
@@ -290,16 +428,41 @@ exports.delete = async (req, res) => {
       events_needed_to_deleted.push(event.event_id);
     });
 
+    let variables = ``;
+    let query = ``;
+    let inputs = ``;
+    let input_count = 1;
+    let get_inputs = (count, event) => {
+      return `"input${count}": {
+		                    "eventId": "${event}"
+	                    }`;
+    };
+
     for (const event of events_needed_to_deleted) {
-      response = await utils.axios.post("https://api.meetup.com/gql", {
-        query: queries.delete_event,
-        variables: `{
-                        "input": {
-                            "eventId": "${event}"
-                        }
-                    }`,
-      });
+      let { current_variable, current_query } =
+        queries.delete_event(input_count);
+
+      if (input_count === 1) {
+        variables += `${current_variable}`;
+        query += `${current_query}`;
+        inputs += `${get_inputs(input_count, event)}`;
+      } else {
+        variables += `, ${current_variable}`;
+        query += `, ${current_query}`;
+        inputs += `, ${get_inputs(input_count, event)}`;
+      }
+
+      input_count += 1;
     }
+
+    response = await utils.axios.post("https://api.meetup.com/gql", {
+      query: `  mutation(${variables}) {
+            ${query}
+          }`,
+      variables: `{
+                        ${inputs}
+                    }`,
+    });
 
     return res.redirect("/dashboard");
   } catch (error) {

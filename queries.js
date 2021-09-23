@@ -40,10 +40,10 @@ exports.get_event = `
   }
 }`;
 
-
-exports.create_event_draft = `
-      mutation($input: CreateEventDraftInput!) {
-  createEventDraft(input: $input) {
+exports.create_event_draft = (count) => {
+  return {
+    current_variable: `$input${count}: CreateEventDraftInput!`,
+    current_query: `query${count}: createEventDraft(input: $input${count}) {
     event {
       id
     }
@@ -52,13 +52,14 @@ exports.create_event_draft = `
       code
       field
     }
-  }
-}`;
+  }`,
+  };
+};
 
-
-exports.publish_event = `
-    mutation($input: PublishEventDraftInput!) {
-  publishEventDraft(input: $input) {
+exports.publish_event = (count) => {
+  return {
+    current_variable: `$input${count}: PublishEventDraftInput!`,
+    current_query: `query${count}: publishEventDraft(input: $input${count}) {
     event {
       id
     }
@@ -67,12 +68,15 @@ exports.publish_event = `
       code
       field
     }
-  }
-}`;
+  }`,
+  };
+};
 
-exports.edit_event = `
-        mutation($input: EditEventInput!) {
-  editEvent(input: $input) {
+exports.edit_event = (count) => {
+  return {
+    current_variable: `$input${count}: EditEventInput!`,
+
+    current_query: `query${count}: editEvent(input: $input${count}) {
     event {
       id
     }
@@ -81,17 +85,19 @@ exports.edit_event = `
       code
       field
     }
-  }
-}`
+  }`,
+  };
+};
 
-
-exports.delete_event = `
-    mutation($input: DeleteEventInput!) {
-  deleteEvent(input: $input) {
+exports.delete_event = (count) => {
+  return {
+    current_variable: `$input${count}: DeleteEventInput!`,
+    current_query: `query${count}: deleteEvent(input: $input${count}) {
     errors {
       message
       code
       field
     }
-  }
-}`;
+  }`,
+  };
+};
