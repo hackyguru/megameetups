@@ -101,3 +101,19 @@ exports.delete_event = (count) => {
   }`,
   };
 };
+
+exports.announce_event = (count) => {
+  return {
+    current_variable: `$input${count}: AnnounceEventInput!`,
+    current_query: `query${count}: announceEvent(input: $input${count}) {
+    event {
+      id
+    }
+    errors {
+      message
+      code
+      field
+    }
+  }`,
+  };
+};

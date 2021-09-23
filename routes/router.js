@@ -15,5 +15,6 @@ router.post("/events/store", utils.is_authenticated_middleware, eventsController
 router.get("/dashboard/events/:event_title", utils.is_authenticated_middleware, eventsController.show);
 router.post("/events/update", utils.is_authenticated_middleware, eventsController.update);
 router.post("/events/delete", utils.is_authenticated_middleware, eventsController.delete);
+router.post("/events/announce", utils.is_authenticated_middleware, eventsController.announce);
 
 module.exports = router;

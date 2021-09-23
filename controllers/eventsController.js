@@ -132,7 +132,7 @@ exports.update = async (req, res) => {
     let events_needed_to_deleted = [];
     let groups_input = req.body.groups;
 
-    if (groups_input === undefined) {
+    if (groups_input === undefined || groups_input == []) {
       return res.send(400, "Please select atleast one group");
     }
 
@@ -228,14 +228,16 @@ exports.update = async (req, res) => {
       input_count += 1;
     }
 
-    response = await utils.axios.post("https://api.meetup.com/gql", {
-      query: `mutation(${variables}) {
+    if (input_count > 1) {
+      response = await utils.axios.post("https://api.meetup.com/gql", {
+        query: `mutation(${variables}) {
                   ${query}
               }`,
-      variables: `{
+        variables: `{
                     ${inputs}
                   }`,
-    });
+      });
+    }
 
     let events_ids_published = [];
 
@@ -266,14 +268,16 @@ exports.update = async (req, res) => {
       input_count += 1;
     }
 
-    response = await utils.axios.post("https://api.meetup.com/gql", {
-      query: `  mutation(${variables}) {
+    if (input_count > 1) {
+      response = await utils.axios.post("https://api.meetup.com/gql", {
+        query: `  mutation(${variables}) {
             ${query}
           }`,
-      variables: `{
+        variables: `{
                    ${inputs}
                   }`,
-    });
+      });
+    }
 
     return res.redirect("/dashboard");
   } catch (error) {
@@ -311,6 +315,10 @@ exports.store = async (req, res) => {
     let dateTime = req.body.dateTime;
     let duration = req.body.duration;
     let response = "";
+
+    if (groups_input === undefined || groups_input == []) {
+      return res.send(400, "Please select atleast one group");
+    }
 
     let variables = ``;
     let query = ``;
@@ -351,8 +359,8 @@ exports.store = async (req, res) => {
             ${query}
           }`,
       variables: `{
-                        ${inputs}
-                    }`,
+                    ${inputs}
+                  }`,
     });
 
     let events_ids_published = [];
@@ -441,6 +449,72 @@ exports.delete = async (req, res) => {
     for (const event of events_needed_to_deleted) {
       let { current_variable, current_query } =
         queries.delete_event(input_count);
+
+      if (input_count === 1) {
+        variables += `${current_variable}`;
+        query += `${current_query}`;
+        inputs += `${get_inputs(input_count, event)}`;
+      } else {
+        variables += `, ${current_variable}`;
+        query += `, ${current_query}`;
+        inputs += `, ${get_inputs(input_count, event)}`;
+      }
+
+      input_count += 1;
+    }
+
+    response = await utils.axios.post("https://api.meetup.com/gql", {
+      query: `  mutation(${variables}) {
+            ${query}
+          }`,
+      variables: `{
+                        ${inputs}
+                    }`,
+    });
+
+    return res.redirect("/dashboard");
+  } catch (error) {
+    console.log(error);
+    return res.json(error);
+  }
+};
+
+exports.announce = async (req, res) => {
+  try {
+    let response = await utils.axios.post("https://api.meetup.com/gql", {
+      query: queries.get_groups_events,
+    });
+
+    let data = response.data.data;
+
+    let { groups, events, event_groups_map } = utils.parse_get_events(data);
+
+    let title = req.body.title;
+    let current_event = event_groups_map[title];
+
+    if (current_event === undefined) {
+      return res.send(404, event_groups_map);
+    }
+
+    let events_needed_to_announced = [];
+
+    current_event.forEach((event) => {
+      events_needed_to_announced.push(event.event_id);
+    });
+
+    let variables = ``;
+    let query = ``;
+    let inputs = ``;
+    let input_count = 1;
+    let get_inputs = (count, event) => {
+      return `"input${count}": {
+		                    "eventId": "${event}"
+	                    }`;
+    };
+
+    for (const event of events_needed_to_announced) {
+      let { current_variable, current_query } =
+        queries.announce_event(input_count);
 
       if (input_count === 1) {
         variables += `${current_variable}`;
