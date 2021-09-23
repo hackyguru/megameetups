@@ -7,6 +7,7 @@ const router = express.Router();
 router.get("/login", authController.login);
 router.get("/request_access", authController.request_access);
 router.get("/refresh_token", authController.refresh_token);
+router.get("/logout", authController.logout);
 
 
 router.get("/dashboard", utils.is_authenticated_middleware, eventsController.dashboard);

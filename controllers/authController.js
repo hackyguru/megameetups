@@ -13,6 +13,13 @@ exports.login = (req, res) => {
 
 exports.request_access = async (req, res) => {
   try {
+    let error = req.query.error;
+    if (error === "access_denied") {
+      return res.send(
+        400,
+        `Please authorize client to login <br> <a href="/login">Click here to try again</a>`
+      );
+    }
     let code = req.query.code;
     let consumer_key = process.env.MEETUP_CONSUMER_KEY;
     let consumer_secret = process.env.MEETUP_CONSUMER_SECRET;
@@ -64,4 +71,10 @@ exports.refresh_token = async (req, res) => {
 
     return res.redirect("/login");
   }
+};
+
+exports.logout = (req, res) => {
+  utils.logout(req);
+
+  return res.redirect("/");
 };

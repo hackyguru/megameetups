@@ -19,7 +19,7 @@ app.use(cookieParser());
 app.use(
     sessions({
         secret:
-            process.env.SESSION_SECRET,
+        process.env.SESSION_SECRET,
         saveUninitialized: false,
         cookie: { maxAge: 1000 * 60 * 60 * 3 },
         resave: false,
@@ -27,7 +27,7 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-  res.redirect('/dashboard');
+    return res.render("index");
 });
 
 app.use(routes)
