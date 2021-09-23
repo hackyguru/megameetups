@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Mega Meetups</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.10.2/css/all.css">
+    <link
+            href="https://unpkg.com/tailwindcss/dist/tailwind.min.css"
+            rel="stylesheet"
+    />
+    <link
+            href="https://unpkg.com/@tailwindcss/custom-forms/dist/custom-forms.min.css"
+            rel="stylesheet"
+    />
+
+    <style>
+        @import url("https://rsms.me/inter/inter.css");
+        html {
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+            Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+            "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+            "Noto Color Emoji";
+        }
+
+        .gradient {
+            background-image: linear-gradient(-225deg, #ffe3e8 0%, #ffe3e8 100%);
+        }
+
+        button,
+        .gradient2 {
+            background-color: #f39f86;
+            background-image: linear-gradient(315deg, #F64060 0%, #F64060 74%);
+        }
+
+        .browser-mockup {
+            border-top: 2em solid rgba(230, 230, 230, 0.7);
+            position: relative;
+        }
+
+        .browser-mockup:before {
+            display: block;
+            position: absolute;
+            content: "";
+            top: -1.25em;
+            left: 1em;
+            width: 0.5em;
+            height: 0.5em;
+            border-radius: 50%;
+            background-color: #f44;
+            box-shadow: 0 0 0 2px #f44, 1.5em 0 0 2px #9b3, 3em 0 0 2px #fb5;
+        }
+
+        .browser-mockup > * {
+            display: block;
+        }
+
+    </style>
+</head>
+
+<body class="gradient leading-relaxed tracking-wide flex flex-col">
+<div class="container mx-auto h-screen">
+    <div class="text-center px-3 lg:px-0">
+        <h1
+                class="my-4 text-2xl md:text-3xl lg:text-5xl font-black leading-tight"
+        >
+            Mega meetups
+        </h1>
+        <p
+                class="
+            leading-normal
+            text-gray-800 text-base
+            md:text-xl
+            lg:text-sm
+            mb-8
+          "
+        ><i>
+                A meetup-api client helping you to manage your meetups<i>
+        </p>
+
+        <a href="/login">
+            <button
+                    href="/login"
+                    class="
+              mx-auto
+              lg:mx-0
+              transform
+              hover:-translate-y-1
+              hover:scale-110
+              ease-in-out
+              text-white
+              font-extrabold
+              rounded
+              my-2
+              md:my-6
+              py-4
+              px-8
+              shadow-lg
+              w-48
+            "
+            >
+                Login
+            </button>
+        </a>
+    </div>
+
+    <div class="flex items-center w-full mx-auto content-end">
+        <div
+                class="
+            browser-mockup
+            flex flex-1
+            m-6
+            md:px-0 md:m-12
+            bg-white
+            w-1/2
+            rounded
+            shadow-xl
+          "
+        >
+            <img src="https://cdn.discordapp.com/attachments/823536743135445007/890545921279008768/meetup-cover.png" /> </div>
+    </div>
+</div>
+
+<section class="bg-white border-b py-2">
+    <div
+            class="
+          container
+          mx-auto
+          flex flex-wrap
+          items-center
+          justify-between
+        "
+    >
+        <h2
+                class="
+            w-full
+            my-10
+            text-xl
+            font-black
+            leading-tight
+            text-center text-gray-800
+
+          "
+        >
+            <br /><br /><br />          <br /><br /><br />          <br /><br /><br />
+            <br /><br /><br />
+            <br /><br /><br />
+            Made with 🧡. Checkout <a href="https://github.com/hackyguru/megameetups" class="underline">Github and Docs</a>
+        </h2>
+        <div class="w-full mb-4">
+            <div
+                    class="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"
+            ></div>
+        </div>
+
+
+    </div>
+</section>
+</body>
+</html>

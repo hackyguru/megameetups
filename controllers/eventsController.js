@@ -43,6 +43,9 @@ exports.dashboard = async (req, res) => {
     event_data["dateTime"] = moment
       .parseZone(event_data.dateTime)
       .format("YYYY-MM-DD[T]HH:mm");
+    event_data["duration"] = event_data["duration"]
+      .replace("PT", "")
+      .replace("H", "");
 
     return res.render("dashboard", {
       name: data.self.name,
@@ -94,6 +97,9 @@ exports.show = async (req, res) => {
     event_data["dateTime"] = moment
       .parseZone(event_data.dateTime)
       .format("YYYY-MM-DD[T]HH:mm");
+    event_data["duration"] = event_data["duration"]
+      .replace("PT", "")
+      .replace("H", "");
 
     return res.render("dashboard", {
       name: data.self.name,
@@ -146,7 +152,7 @@ exports.update = async (req, res) => {
                             "title": "${title}",
                             "description": "${description}",
                             "startDateTime": "${dateTime}",
-                            "duration": "${duration}"
+                            "duration": "PT${duration}H"
 	                    }`;
     };
 
@@ -183,7 +189,7 @@ exports.update = async (req, res) => {
                         "description": "${description}",
                         "startDateTime": "${dateTime}",
                         "venueId": "online",
-                        "duration": "${duration}"
+                        "duration": "PT${duration}H"
                     }`;
     };
 
@@ -279,7 +285,7 @@ exports.update = async (req, res) => {
       });
     }
 
-    return res.redirect("/dashboard");
+    return res.redirect("back");
   } catch (error) {
     console.log(error);
     return res.json(error);
@@ -332,7 +338,7 @@ exports.store = async (req, res) => {
                         "description": "${description}",
                         "startDateTime": "${dateTime}",
                         "venueId": "online",
-                        "duration": "${duration}"
+                        "duration": "PT${duration}H"
                     }`;
     };
 
@@ -359,8 +365,8 @@ exports.store = async (req, res) => {
             ${query}
           }`,
       variables: `{
-                    ${inputs}
-                  }`,
+                        ${inputs}
+                    }`,
     });
 
     let events_ids_published = [];
@@ -406,7 +412,7 @@ exports.store = async (req, res) => {
                     }`,
     });
 
-    return res.redirect("/dashboard");
+    return res.redirect("back");
   } catch (error) {
     console.log(error);
     return res.json(error);
@@ -538,7 +544,7 @@ exports.announce = async (req, res) => {
                     }`,
     });
 
-    return res.redirect("/dashboard");
+    return res.redirect("back");
   } catch (error) {
     console.log(error);
     return res.json(error);
