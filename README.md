@@ -21,7 +21,7 @@ v1.0 - Bulk Meetup Creation
 - [x] I can enter details into a form for creating a new meetup
 - [x] I can see a list of the Meetup groups I'm admin of
 - [x] I can select the Meetup groups I'd like to add the new meetup to
-- [] I can submit the form, and the new meetup will be posted to all the selected groups
+- [x] I can submit the form, and the new meetup will be posted to all the selected groups
 
 v2.0 - Bulk Meetup Updates
 - [x] I can see a list of meetups scheduled across my groups, grouped by meetup title
